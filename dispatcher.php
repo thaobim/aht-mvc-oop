@@ -1,12 +1,12 @@
 <?php
 
-namespace Mvc;
+namespace AHT;
 
-use Mvc\request;
+use AHT\Request;
 
-use Mvc\Router;
+use AHT\Router;
 
-use Mvc\Controllers\tasksController;
+use AHT\Controllers\TasksController;
 
 class Dispatcher
 {
@@ -15,7 +15,7 @@ class Dispatcher
 
     public function dispatch()
     {
-        $this->request = new request\Request();
+        $this->request = new Request\Request();
         $Router = new Router\Router();
         $Router::parse($this->request->url, $this->request);
         
@@ -26,17 +26,12 @@ class Dispatcher
 
     public function loadController()
     {
-        $name1 = $this->request->controller;
-        // $name = new Controllers\tasksController();
-        // $file = ROOT . 'Controllers/' . $name . '.php';
 
-        $name = "\Mvc\Controllers\\" . $name1 . "Controller";
-        $file = ROOT . 'Controllers/' . $name1 . 'Controller.php';
-
-        require($file);
-        $controller = new $name();
+        $name = ucfirst($this->request->controller);
+        $newsName = str_replace("Controller", "", $name);
+        $file = "AHT\\Controllers\\". $newsName . 'Controller';
+        $controller = new $file();
         return $controller;
     }
 
 }
-?>

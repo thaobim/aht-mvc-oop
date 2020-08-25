@@ -1,76 +1,89 @@
 <?php
+namespace AHT\Controllers;
 
-namespace Mvc\Controllers;
-
-use Mvc\Models\Task;
-
-use Mvc\Core\Controller;
-
-use Mvc\Models\TaskRepository;
-
+use AHT\Core\Controller;
+use AHT\Entities\Tasks;
+use AHT\Models\TaskRepository;
 class TasksController extends Controller
 {
-
-    private $TaskRepository;
-
-    public function __construct(){
-        $this->TaskRepository = new TaskRepository();
-    }
-
     function index()
     {
-        $newTask = new Task();
-        $d['tasks'] = $this->TaskRepository->getAll($newTask);
+
+        $tasks = new TaskRepository();
+        $d['tasks'] = $tasks->showAllTasks();
         $this->set($d);
         $this->render("index");
     }
-
+    function formCreate()
+    {
+        $this->render("create");
+    }
     function create()
     {
         if (isset($_POST["title"]))
         {
-            $task= new Task();
-            $task->setTitle($_POST["title"]);
-            $task->setDescription($_POST["description"]);
+            $title = $_POST["title"];
+            $description = $_POST["description"];
+            //$created_at = date('Y-m-d H:i:s');
+          // $updated_at = date('Y-m-d H:i:s');
+            $task = new Tasks();
+            $task->setDescription($description);
+            $task->setTitle($title);
+           // $task->setCreatedAt($created_at);
+           // $task->setUpdatedAt($updated_at);
+            $taskRepository = new TaskRepository();
 
-            if ($this->TaskRepository->add($task))
+            if ($taskRepository->create($task))
             {
-                header("Location: " . WEBROOT . "tasks/index");
+                //die('taskController');
+                header("Location: /aht-mvc-oop");
             }
         }
 
         $this->render("create");
     }
-
     function edit($id)
     {
-        $task= new Task();
-        $task->setID($id);
+        $tasks = new TaskRepository();
 
-        if (isset($_POST["title"]))
-        {
-            $task->setTitle($_POST["title"]);
-            $task->setDescription($_POST["description"]);
-
-            if ($this->TaskRepository->update($task))
+            if (isset($_POST["title"]))
             {
-                header("Location: " . WEBROOT . "tasks/index");
+//                echo $id;
+//                die();
+                $getId = $id;
+                $title = $_POST["title"];
+                $description = $_POST["description"];
+                //$created_at = date('Y-m-d H:i:s');
+                //$updated_at = date('Y-m-d H:i:s');
+                $task = new Tasks();
+                $task->setDescription($description);
+                $task->setId($getId);
+                $task->setTitle($title);
+                //$task->setCreated_at($created_at);
+               // $task->setUpdated_at($updated_at);
+               // die("here out");
+                if ($tasks->update($getId, $task))
+                {
+                   // die("here if");
+                   header("Location: /aht-mvc-oop");
+                }
             }
-        }
-
-        $d["task"] = $this->TaskRepository->findID($id);
-
+        $d['tasks'] = $tasks->showTask($id);
         $this->set($d);
         $this->render("edit");
     }
 
     function delete($id)
     {
-        $task = new Task();
-        $task->setID($id);
-        if ($this->TaskRepository->delete($task))
-        {
-            header("Location: " . WEBROOT . "tasks/index");
+        if(isset($id)){
+            $task = new Tasks();
+            $task->setId($id);
+            $taskRepository = new TaskRepository();
+            if ($taskRepository->delete($id))
+            {
+                header("Location: /aht-mvc-oop");
+            }
         }
     }
 }
+?>

@@ -1,12 +1,22 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: DELL
+ * Date: 7/13/2020
+ * Time: 3:40 PM
+ */
 
-namespace Mvc\Models;
+namespace AHT\Models;
 
-use Mvc\Core\ResourceModel;
-use Mvc\Models\Task;
 
-class TaskResourceModel extends ResourceModel{
-    public function __construct(){
-        $this->_init("tasks","",new Task());
+use AHT\Core\ResourceModel;
+use AHT\Entities\Task;
+
+class TaskResourceModel extends ResourceModel
+{
+    public function __construct()
+    {
+        $task = new Task();
+        parent::_init("tasks","id",$task);
     }
 }

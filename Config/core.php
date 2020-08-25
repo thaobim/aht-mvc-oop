@@ -1,10 +1,5 @@
 <?php
-
-use Mvc\Config\db;
-
-use Mvc\Core\Model;
-
-use Mvc\Core\Controller;
+namespace AHT\Config;
 
 require(ROOT . "Config/db.php");
 require(ROOT . "Core/Model.php");

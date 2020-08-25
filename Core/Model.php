@@ -1,11 +1,17 @@
 <?php
+namespace AHT\Core;
 
-    namespace Mvc\Core;
-    
-    class Model
+
+class Model
+{
+
+    public function __construct()
     {
-        public function getProperties(){
-            return get_object_vars($this);
-        }
+
+       return get_object_vars($this);
+
     }
+
+}
+
 ?>

@@ -1,123 +1,83 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: DELL
+ * Date: 7/13/2020
+ * Time: 3:29 PM
+ */
 
-namespace Mvc\Core;
+namespace AHT\Core;
+use AHT\Config\Database;
+use AHT\Core\ResourceModelInterface;
+use PDO;
+//use AHT\Entities\Tasks;
 
-use Mvc\Core\ResourceModelInterFace;
-use Mvc\Config\Database;
 
-class ResourceModel implements ResourceModelInterFace
+class ResourceModel implements ResourceModelInterface
 {
-
     private $table;
     private $id;
     private $model;
 
-    public function _init($table, $id, $model)
-    {
-        $this->table = $table;
-        $this->id = $id;
-        $this->model = $model;
-    }
+        public function _init($table, $id, $model)
+        {
+            $this->table = $table;
 
-    public function save($model)
-    {
-        $id = $model->getID();
-        $title = $model->getTitle();
-        $description = $model->getDescription();
+            $this->id = $id;
 
-        $props = $model->getProperties();
-        
-        if ($id) {
-            $sql = "UPDATE $this->table SET ";
-            unset($props['id']);
-            if(count($props) > 0 ){
-                $i = 0;
-                foreach($props as $key => $prop){
-                    if($i == count($props) - 1){
-                        $sql .= "$key =:$key ";
-                    }else{
-                        $sql .= "$key =:$key ,";
-                    }
-                    $i++;
-                }
-                $sql .= "WHERE id = :id";
+            $this->model = $model;
+
+        }
+        public function save($model)
+        {
+            $this->model = $model;
+            require ("../bootstrap.php");
+            $entityManager->persist($this->model);
+            $entityManager->flush();
+            return true;
+
+        }
+        public function edit($id)
+        {
+            $this->id = $id;
+            require ("../bootstrap.php");
+            $result = $entityManager->getRepository(\AHT\Entities\Tasks::class)->find($id);
+//            var_dump($result);
+//            die();
+            return $result;
+
+        }
+        public function update($id,$model)
+        {
+            $this->model = $model;
+            require ("../bootstrap.php");
+            $this->id = $id;
+            $result =  $entityManager->getRepository(\AHT\Entities\Tasks::class)->find($this->id);
+            $entityManager->persist($this->model);
+            $entityManager->flush();
+            return true;
+        }
+        public function delete($id)
+        {
+
+            require ("../bootstrap.php");
+            $this->id = $id;
+            $result =  $entityManager->find(\AHT\Entities\Tasks::class, $this->id);
+            if ($result != null) {
+                $entityManager->remove($result);
+                $entityManager->flush();
+                return true;
             }
 
-            $req = Database::getBdd()->prepare($sql);
-            return $req->execute([
-                'title' => $title,
-                'description' => $description,
-                'updated_at' => date("Y-m-d h:i:s"),
-                'created_at' => $this->getCreatedAt($id),
-                'id' => $id
-            ]);
-        } else {
-            $sql = "INSERT INTO $this->table ";
-            if(count($props) > 0 ){
-                $valueField = "(";
-                $labelField = "(";
-                $i = 0;
-                foreach($props as $key => $prop){
-                    if($key !== "id"){
-                        if($i == count($props) - 1){
-                            $labelField .= $key.")";
-                            $valueField .= ":".$key.")";
-                        }else{
-                            $labelField .= $key.", ";
-                            $valueField .= ":".$key.", ";
-                        }
-                    }
-                    $i++;
-                }
-                $sql .= $labelField ." VALUES ". $valueField;
-            }
-            $req = Database::getBdd()->prepare($sql);
-            return $req->execute([
-                'title' => $title,
-                'description' => $description,
-                'created_at' => date("Y-m-d h:i:s"),
-                'updated_at' => NULL
-            ]);
         }
-    }
+        public function getAll(){
 
-    public function delete($model)
-    {
-        $id = $model->getID();
+            require ("../bootstrap.php");
 
-        if($id){
-            $sql = "DELETE FROM " . $this->table . " WHERE id = :id";
-            $req = Database::getBdd()->prepare($sql);
-            return $req->execute([
-                'id' => $id
-            ]);
+            $result = $entityManager->getRepository(\AHT\Entities\Tasks::class)->findAll();
+
+            return $result;
         }
-    }
 
-    public function getCreatedAt($id){
-        $sql =  "SELECT created_at FROM $this->table WHERE id = $id";
 
-        $req = Database::getBdd()->prepare($sql);
-
-        if($req->execute()) return $req->fetch()['created_at'];
-    }
-
-    public function getAll(){
-        $sql =  "SELECT * FROM $this->table";
-
-        $req = Database::getBdd()->prepare($sql);
-
-        if($req->execute()) 
-        return $req->fetchAll();
-    }
-
-    public function findID($id){
-        $sql =  "SELECT * FROM $this->table WHERE id = $id";
-
-        $req = Database::getBdd()->prepare($sql);
-
-        if($req->execute()){
-            return  $req->fetch();
-        }
-    }
 }

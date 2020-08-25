@@ -1,41 +1,76 @@
 <?php
+namespace AHT\Models;
 
-namespace Mvc\Models;
+use AHT\Core\ResourceModel;
 
-use Mvc\Models\TaskResourceModel;
+class TaskRepository
+{
 
-class TaskRepository{
-
-    private $TaskResourceModel;
+    private $taskResource;
 
     public function __construct()
     {
-        $this->TaskResourceModel = new TaskResourceModel();
+        $this->taskResource = new ResourceModel();
     }
 
-    public function add($model){
-        
-        return $this->TaskResourceModel->save($model);
+    public function create($model)
+    {
+
+        $success = $this->taskResource->save($model);
+
+
+        if($success){
+
+            return true;
+
+        }else{
+
+            return false;
+
+        }
     }
 
-    public function update($model){
-        
-        return $this->TaskResourceModel->save($model);
+    public function showTask($id)
+    {
+        return $this->taskResource->edit($id);
     }
 
-    public function get($id){
-        
+    public function showAllTasks()
+    {
+        return $this->taskResource->getAll();
     }
 
-    public function delete($model){
-        return $this->TaskResourceModel->delete($model);
-    }
 
-    public function findID($id){
-        return $this->TaskResourceModel->findID($id);
-    }
+    public function update($id, $model)
+    {
+        $success = $this->taskResource->update($id,$model);
 
-    public function getAll(){
-        return $this->TaskResourceModel->getAll();
+        //var_dump($success);
+        //die();
+
+        if($success){
+
+            return true;
+
+        }else{
+
+            return false;
+
+        }
+
+    }
+    public function delete($id)
+    {
+        $success = $this->taskResource->delete($id);
+
+        if($success){
+
+            return true;
+
+        }else{
+
+            return false;
+        }
+
     }
 }
